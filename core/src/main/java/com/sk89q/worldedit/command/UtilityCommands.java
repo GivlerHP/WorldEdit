@@ -205,7 +205,7 @@ public class UtilityCommands {
         int size = args.argsLength() > 0 ? Math.max(1, args.getInteger(0)) : 1;
         we.checkMaxRadius(size);
         World world = player.getWorld();
-        int height = args.argsLength() > 1 ? Math.min((world.getMaxY() + 1), args.getInteger(1) + 2) : (world.getMaxY() + 1);
+        int height = args.argsLength() > 1 ? Math.min((world.getMaxY() - world.getMinimumPoint().getBlockY() + 1), args.getInteger(1) + 2) : (world.getMaxY() - world.getMinimumPoint().getBlockY() + 1);
 
         int affected = editSession.removeAbove(
                 session.getPlacementPosition(player), size, height);
@@ -226,7 +226,7 @@ public class UtilityCommands {
         int size = args.argsLength() > 0 ? Math.max(1, args.getInteger(0)) : 1;
         we.checkMaxRadius(size);
         World world = player.getWorld();
-        int height = args.argsLength() > 1 ? Math.min((world.getMaxY() + 1), args.getInteger(1) + 2) : (world.getMaxY() + 1);
+        int height = args.argsLength() > 1 ? Math.min((world.getMaxY() - world.getMinimumPoint().getBlockY() + 1), args.getInteger(1) + 2) : (world.getMaxY() - world.getMinimumPoint().getBlockY() + 1);
 
         int affected = editSession.removeBelow(session.getPlacementPosition(player), size, height);
         player.print(affected + " block(s) have been removed.");

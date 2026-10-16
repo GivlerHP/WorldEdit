@@ -96,7 +96,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public void findFreePosition(WorldVector searchPos) {
         World world = searchPos.getWorld();
         int x = searchPos.getBlockX();
-        int y = Math.max(0, searchPos.getBlockY());
+        int y = Math.max(getWorld().getMinimumPoint().getBlockY(), searchPos.getBlockY());
         int origY = y;
         int z = searchPos.getBlockZ();
 
@@ -128,10 +128,10 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public void setOnGround(WorldVector searchPos) {
         World world = searchPos.getWorld();
         int x = searchPos.getBlockX();
-        int y = Math.max(0, searchPos.getBlockY());
+        int y = Math.max(getWorld().getMinimumPoint().getBlockY(), searchPos.getBlockY());
         int z = searchPos.getBlockZ();
 
-        while (y >= 0) {
+        while (y >= world.getMinimumPoint().getBlockY()) {
             final Vector pos = new Vector(x, y, z);
             final int id = world.getBlockType(pos);
             final int data = world.getBlockData(pos);
@@ -153,7 +153,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean ascendLevel() {
         final WorldVector pos = getBlockIn();
         final int x = pos.getBlockX();
-        int y = Math.max(0, pos.getBlockY());
+        int y = Math.max(getWorld().getMinimumPoint().getBlockY(), pos.getBlockY());
         final int z = pos.getBlockZ();
         final World world = pos.getWorld();
 
@@ -194,13 +194,13 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean descendLevel() {
         final WorldVector pos = getBlockIn();
         final int x = pos.getBlockX();
-        int y = Math.max(0, pos.getBlockY() - 1);
+        int y = Math.max(getWorld().getMinimumPoint().getBlockY(), pos.getBlockY() - 1);
         final int z = pos.getBlockZ();
         final World world = pos.getWorld();
 
         byte free = 0;
 
-        while (y >= 1) {
+        while (y > world.getMinimumPoint().getBlockY()) {
             if (BlockType.canPassThrough(world.getBlock(new Vector(x, y, z)))) {
                 ++free;
             } else {
@@ -211,7 +211,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 // So we've found a spot, but we have to drop the player
                 // lightly and also check to see if there's something to
                 // stand upon
-                while (y >= 0) {
+                while (y >= world.getMinimumPoint().getBlockY()) {
                     final Vector platform = new Vector(x, y, z);
                     final BaseBlock block = world.getBlock(platform);
                     final int type = block.getId();
@@ -244,8 +244,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean ascendToCeiling(int clearance, boolean alwaysGlass) {
         Vector pos = getBlockIn();
         int x = pos.getBlockX();
-        int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 2);
+        int initialY = Math.max(getWorld().getMinimumPoint().getBlockY(), pos.getBlockY());
+        int y = Math.max(getWorld().getMinimumPoint().getBlockY(), pos.getBlockY() + 2);
         int z = pos.getBlockZ();
         World world = getPosition().getWorld();
 
@@ -277,8 +277,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public boolean ascendUpwards(int distance, boolean alwaysGlass) {
         final Vector pos = getBlockIn();
         final int x = pos.getBlockX();
-        final int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 1);
+        final int initialY = Math.max(getWorld().getMinimumPoint().getBlockY(), pos.getBlockY());
+        int y = Math.max(getWorld().getMinimumPoint().getBlockY(), pos.getBlockY() + 1);
         final int z = pos.getBlockZ();
         final int maxY = Math.min(getWorld().getMaxY() + 1, initialY + distance);
         final World world = getPosition().getWorld();

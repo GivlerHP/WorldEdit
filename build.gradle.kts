@@ -1,8 +1,11 @@
+import org.gradle.jvm.toolchain.JvmVendorSpec
+
 plugins {
     id("fpgradle-minecraft") version("0.6.1")
 }
 
 group = "com.falsepattern"
+version = "6.3.1"
 
 minecraft_fp {
     mod {
@@ -83,4 +86,10 @@ tasks.named<Test>("test") {
     testLogging {
         events("passed")
     }
+}
+
+// fpgradle pins legacy compilation to Adoptium, but any Java 8 JDK is suitable.
+// Use the Oracle JDK 8 already installed on this development machine.
+afterEvaluate {
+    java.toolchain.vendor = JvmVendorSpec.ORACLE
 }

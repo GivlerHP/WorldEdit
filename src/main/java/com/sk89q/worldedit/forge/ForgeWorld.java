@@ -129,6 +129,24 @@ public class ForgeWorld extends AbstractWorld {
         }
     }
 
+    private static final java.lang.reflect.Method CAVE_MIN_Y = findMinimumY();
+
+    private static java.lang.reflect.Method findMinimumY() {
+        try { return Class.forName("ru.givler.caveabyss.core.MinusOneHooks").getMethod("minimumY", World.class); }
+        catch (ClassNotFoundException absent) { return null; }
+        catch (NoSuchMethodException error) { throw new IllegalStateException("CaveAbyss height API missing", error); }
+    }
+
+    @Override
+    public Vector getMinimumPoint() {
+        int minY = 0;
+        if (CAVE_MIN_Y != null) {
+            try { minY = ((Number) CAVE_MIN_Y.invoke(null, getWorld())).intValue(); }
+            catch (ReflectiveOperationException error) { throw new IllegalStateException("CaveAbyss height API failed", error); }
+        }
+        return new Vector(-30000000, minY, -30000000);
+    }
+
     @Override
     public String getName() {
         return getWorld().getWorldInfo().getWorldName();
@@ -243,13 +261,15 @@ public class ForgeWorld extends AbstractWorld {
 
     @Override
     public boolean regenerate(Region region, EditSession editSession) {
-        BaseBlock[] history = new BaseBlock[256 * (getMaxY() + 1)];
+        int minY = getMinimumPoint().getBlockY();
+        int height = getMaxY() - minY + 1;
+        BaseBlock[] history = new BaseBlock[256 * height];
 
         for (Vector2D chunk : region.getChunks()) {
-            Vector min = new Vector(chunk.getBlockX() * 16, 0, chunk.getBlockZ() * 16);
+            Vector min = new Vector(chunk.getBlockX() * 16, minY, chunk.getBlockZ() * 16);
 
             for (int x = 0; x < 16; x++) {
-                for (int y = 0; y < getMaxY() + 1; y++) {
+                for (int y = 0; y < height; y++) {
                     for (int z = 0; z < 16; z++) {
                         Vector pt = min.add(x, y, z);
                         int index = y * 16 * 16 + z * 16 + x;
@@ -320,7 +340,7 @@ public class ForgeWorld extends AbstractWorld {
             }
 
             for (int x = 0; x < 16; x++) {
-                for (int y = 0; y < getMaxY() + 1; y++) {
+                for (int y = 0; y < height; y++) {
                     for (int z = 0; z < 16; z++) {
                         Vector pt = min.add(x, y, z);
                         int index = y * 16 * 16 + z * 16 + x;
